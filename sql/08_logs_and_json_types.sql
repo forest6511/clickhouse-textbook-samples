@@ -60,7 +60,8 @@ FROM (
 );
 
 -- リスト 8-3
-SELECT body FROM logs_str LIMIT 3;
+-- TSVRaw で出す。罫線テーブルだと 1 行が長すぎて狭い画面で読めないため。
+SELECT body FROM logs_str LIMIT 3 FORMAT TSVRaw;
 
 -- リスト 8-4
 SELECT JSONExtractInt(body, 'status') AS status, count() AS c

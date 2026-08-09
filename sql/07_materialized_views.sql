@@ -216,8 +216,10 @@ SELECT count() AS rows, min(pickup_datetime) AS oldest,
        max(pickup_datetime) AS newest
 FROM raw_ttl;
 
+-- 列が多く横に長いので Vertical で出す（罫線テーブルだと狭い画面で切れる）
 SELECT name, level, delete_ttl_info_min, delete_ttl_info_max, rows
-FROM system.parts WHERE table = 'raw_ttl' AND active;
+FROM system.parts WHERE table = 'raw_ttl' AND active
+FORMAT Vertical;
 
 -- 集計先は TTL の影響を受けない（2026-01-01 からのぶんが残る）
 SELECT count() AS rows, min(day) AS oldest, max(day) AS newest

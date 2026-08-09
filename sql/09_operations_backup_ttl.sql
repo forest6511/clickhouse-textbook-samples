@@ -35,7 +35,7 @@ SELECT
     name,
     status,
     formatReadableSize(total_size) AS size,
-    num_files
+    num_files AS files
 FROM system.backups
 ORDER BY start_time;
 
@@ -217,7 +217,7 @@ LIMIT 5;
 SELECT
     round(query_duration_ms / 1000, 3) AS sec,
     formatReadableSize(read_bytes)     AS read,
-    substring(replaceRegexpAll(query, '\\s+', ' '), 1, 40) AS q
+    substringUTF8(replaceRegexpAll(query, '\\s+', ' '), 1, 26) AS q
 FROM system.query_log
 WHERE type = 'QueryFinish' AND query_duration_ms > 100
 ORDER BY query_duration_ms DESC
