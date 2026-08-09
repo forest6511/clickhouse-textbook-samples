@@ -30,6 +30,28 @@ docker exec -i pg psql -U ch -d chbench < sql/02_postgres_setup.sql
 各章の本文に出てくる SQL は `sql/` に章別でまとめてあります。
 上の初期セットアップを済ませたあと、読んでいる章のファイルを流すと本文と同じ出力が得られます。
 
+**第6章だけは先に準備が要ります。** ファイルの取り込みを扱う章で、
+ClickHouse の `file()` 関数はサーバ内の `user_files` ディレクトリしか読まないため、
+手元のファイルをコンテナへ渡しておく必要があります。
+
+```bash
+# 壊れた行を含む CSV（リスト 6-15）をサーバへ渡す
+docker cp data/bad.csv ch:/var/lib/clickhouse/user_files/
+
+# 本文の trips_sample.csv / .parquet は trips から書き出して作る
+docker exec ch clickhouse-client --query "
+INSERT INTO FUNCTION file('trips_sample.csv', CSVWithNames)
+SELECT * FROM trips LIMIT 100000
+SETTINGS engine_file_truncate_on_insert=1"
+
+docker exec ch clickhouse-client --query "
+INSERT INTO FUNCTION file('trips_sample.parquet', Parquet)
+SELECT * FROM trips LIMIT 100000
+SETTINGS engine_file_truncate_on_insert=1"
+```
+
+準備ができたら各章のスクリプトを流します。
+
 ```bash
 docker exec -i ch clickhouse-client --multiquery < sql/06_loading_data_and_types.sql
 docker exec -i ch clickhouse-client --multiquery < sql/07_materialized_views.sql
@@ -38,6 +60,20 @@ docker exec -i ch clickhouse-client --multiquery < sql/09_operations_backup_ttl.
 ```
 
 第9章のスクリプトは第8章で作るテーブルを使うので、08 → 09 の順に実行してください。
+第9章を **2 回以上流すときは、先にバックアップの実体を消します**。テーブルはスクリプトの
+先頭で消えますが、バックアップは同じ名前で作れず `Code: 598` で止まるためです。
+
+```bash
+docker exec -u root ch sh -c 'rm -rf /var/lib/clickhouse/backups/*'
+```
+
+第8章のスクリプトは、型が混在する JSON を SQL の `INSERT` で投入します。
+同じデータを JSONEachRow 形式のファイルからも入れられます（`data/ev_mixed.jsonl`）。
+
+```bash
+docker exec -i ch clickhouse-client \
+  --query "INSERT INTO ev_mixed FORMAT JSONEachRow" < data/ev_mixed.jsonl
+```
 
 第11章・第12章も同じ単一ノード環境で実行します。
 

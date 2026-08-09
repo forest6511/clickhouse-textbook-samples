@@ -7,6 +7,12 @@
 --
 -- 🔴 基準テーブル trips には書き込まない。SELECT のみ。
 --    章専用テーブル(bk_demo / ttl_demo)と、第8章の logs_hint を使う。
+--
+-- 🔴 2 回目以降に流すときは、先にバックアップ実体を消すこと。
+--    テーブルは下の DROP で消えるが、バックアップは同名で作れず
+--    Code: 598 BACKUP_ALREADY_EXISTS で止まる。
+--
+--    docker exec -u root ch sh -c 'rm -rf /var/lib/clickhouse/backups/*'
 
 DROP TABLE IF EXISTS bk_demo;
 DROP TABLE IF EXISTS bk_demo_restored;

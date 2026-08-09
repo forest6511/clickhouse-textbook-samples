@@ -1,0 +1,5 @@
+{"ts":"2026-01-01 00:00:00","body":{"event":"purchase","value":1980}}
+{"ts":"2026-01-01 00:00:01","body":{"event":"search","value":"shoes"}}
+{"ts":"2026-01-01 00:00:02","body":{"event":"rate","value":4.5}}
+{"ts":"2026-01-01 00:00:03","body":{"event":"toggle","value":true}}
+{"ts":"2026-01-01 00:00:04","body":{"event":"tags","value":[1,2,3]}}
