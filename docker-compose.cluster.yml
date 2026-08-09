@@ -1,0 +1,46 @@
+# 第10章 レプリケーション / シャーディング検証用のクラスタ構成
+# 使い方: docker compose -f docker-compose.cluster.yml up -d
+#
+# 構成: ClickHouse Keeper 1 台 + ClickHouse サーバ 2 台（ch1 / ch2）
+#   - cluster `demo`        … 1 シャード × 2 レプリカ（複製のみ）
+#   - cluster `demo_shards` … 2 シャード × 1 レプリカ（分割のみ）
+#
+# 🔴 Keeper が 1 台なのは検証用。本番では過半数を取るため 3 台以上（奇数）にする。
+# 🔴 本文の第1〜9章で使う単一ノード環境（docker-compose.yml の ch / pg）とは別物。
+#    ポートも 8123/9000 を避けているため、両方を同時に起動できる。
+services:
+  keeper:
+    image: clickhouse/clickhouse-keeper:26.7
+    container_name: keeper
+    volumes:
+      - ./cluster/keeper/keeper.xml:/etc/clickhouse-keeper/keeper_config.xml
+
+  ch1:
+    image: clickhouse/clickhouse-server:26.7
+    container_name: ch1
+    depends_on:
+      - keeper
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    environment:
+      CLICKHOUSE_SKIP_USER_SETUP: "1"
+    volumes:
+      - ./cluster/ch1/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+
+  ch2:
+    image: clickhouse/clickhouse-server:26.7
+    container_name: ch2
+    depends_on:
+      - keeper
+    ports:
+      - "8125:8123"
+      - "9002:9000"
+    environment:
+      CLICKHOUSE_SKIP_USER_SETUP: "1"
+    volumes:
+      - ./cluster/ch2/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }

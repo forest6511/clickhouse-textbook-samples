@@ -1,0 +1,48 @@
+<clickhouse>
+    <!-- 第10章 ノード 1（shard 01 / replica 01） -->
+    <zookeeper>
+        <node>
+            <host>keeper</host>
+            <port>9181</port>
+        </node>
+    </zookeeper>
+
+    <macros>
+        <shard>01</shard>
+        <replica>01</replica>
+        <cluster>demo</cluster>
+    </macros>
+
+    <remote_servers>
+        <!-- 1 シャード × 2 レプリカ（複製のみ・分割なし） -->
+        <demo>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>ch1</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>ch2</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+        </demo>
+
+        <!-- 2 シャード × 1 レプリカ（分割のみ・複製なし） -->
+        <demo_shards>
+            <shard>
+                <replica>
+                    <host>ch1</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <shard>
+                <replica>
+                    <host>ch2</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+        </demo_shards>
+    </remote_servers>
+</clickhouse>

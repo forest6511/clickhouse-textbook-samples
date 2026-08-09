@@ -1,0 +1,23 @@
+# ClickHouse と PostgreSQL を並べて比較するための最小構成
+# 使い方: docker compose up -d
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.7
+    container_name: ch
+    ports:
+      - "8123:8123"   # HTTP / 組み込み Web UI (http://localhost:8123/play)
+      - "9000:9000"   # ネイティブプロトコル (clickhouse-client)
+    environment:
+      CLICKHOUSE_SKIP_USER_SETUP: "1"
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+
+  postgres:
+    image: postgres:17
+    container_name: pg
+    ports:
+      - "55432:5432"  # 5432 はローカルの既存 PG と衝突しやすいのでずらす
+    environment:
+      POSTGRES_USER: ch
+      POSTGRES_PASSWORD: ch
+      POSTGRES_DB: chbench
