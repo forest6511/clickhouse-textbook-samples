@@ -3,6 +3,8 @@
 書籍『ClickHouse の教科書』の実行環境とサンプルです。
 ClickHouse と PostgreSQL を並べて立ち上げ、**同じデータに同じクエリ**を投げて違いを実測します。
 
+Kindle 版: [ClickHouseの教科書](https://www.amazon.co.jp/dp/B0HDLKP8CW)
+
 ## 必要なもの
 
 - Docker Desktop（Windows / macOS）または Docker Engine（Linux）
